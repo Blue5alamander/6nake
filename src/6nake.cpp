@@ -17,6 +17,9 @@ int main() {
         }
 
         auto draw = renderer(5, 5, 5);
+
+        draw.colour(200, 200, 200);
+        draw.line(10, 10, 320, 240);
     }
 
     return 0;
