@@ -13,3 +13,6 @@
 [submodule "libs/memory"]
 	path = libs/memory
 	url = git@github.com:Felspar/memory.git
+[submodule "libs/planet-sdl"]
+	path = libs/planet-sdl
+	url = git@github.com:KayEss/planet-sdl.git
