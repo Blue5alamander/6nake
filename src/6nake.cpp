@@ -3,12 +3,8 @@
 
 int main() {
     planet::sdl::init sdl;
-
-    SDL_Window *const window = SDL_CreateWindow(
-            "6nake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480,
-            0);
-    SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, 0);
-
+    planet::sdl::window window{sdl, "6nake", 640, 480};
+    planet::sdl::renderer renderer{window};
 
     for (bool quit = false; not quit;) {
         SDL_Delay(10);
@@ -20,14 +16,8 @@ int main() {
         case SDL_QUIT: quit = true; break;
         }
 
-        SDL_SetRenderDrawColor(renderer, 5, 5, 5, 255);
-        SDL_RenderClear(renderer);
-
-        SDL_RenderPresent(renderer);
+        auto draw = renderer(5, 5, 5);
     }
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
 
     return 0;
 }
