@@ -5,8 +5,6 @@
 #include <planet/ostream.hpp>
 #include <planet/sdl.hpp>
 
-#include <iostream>
-
 
 int main() {
     planet::sdl::init sdl;
@@ -15,7 +13,6 @@ int main() {
 
     auto world = mapgen::create_map();
     player::snake player{world};
-
 
     for (bool quit = false; not quit;) {
         SDL_Event event;
@@ -36,13 +33,12 @@ int main() {
                         - looking_at;
                 break;
             }
+            break;
         }
 
         if (towards.mag2() > 2.0f) {
             auto const theta = towards.theta();
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
-            std::cout << "Moving towards " << towards << " theta " << theta
-                      << " index " << index << '\n';
             player.move(world, planet::hexmap::directions[index]);
         }
 
