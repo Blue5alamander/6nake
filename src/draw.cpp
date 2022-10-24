@@ -23,7 +23,7 @@ void draw::world(
         planet::sdl::drawframe &draw,
         mapgen::hex::world_type const &world,
         player::snake const &player,
-        long range) {
+        long const range) {
     auto const top_left =
             player.position + planet::hexmap::coordinates{-range, range};
     auto const bottom_right = player.position
@@ -33,9 +33,12 @@ void draw::world(
          planet::hexmap::coordinates::by_column(top_left, bottom_right)) {
         auto const &cell = world[loc];
         if ((player.position - loc).mag2() <= range * range) {
-            if (player.position == loc or cell.player) {
+            if (player.position == loc) {
                 draw.colour(0, 255, 0);
                 draw_hex(draw, loc, 0.8f);
+            } else if (cell.player) {
+                draw.colour(0, 255, 0);
+                draw_hex(draw, loc, 0.6f);
             } else {
                 switch (cell.features) {
                 case mapgen::feature::none:
