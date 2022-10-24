@@ -1,4 +1,8 @@
 #include <planet/sdl.hpp>
+#include <planet/hexmap.hpp>
+
+#include <iostream>
+#include <planet/ostream.hpp>
 
 
 int main() {
@@ -19,7 +23,14 @@ int main() {
         auto draw = renderer(5, 5, 5);
 
         draw.colour(200, 200, 200);
-        draw.line(10, 10, 320, 240);
+        auto const vertices =
+                planet::hexmap::coordinates{}.vertices(1.0f, 0.9f);
+        for (std::size_t index{}; index < vertices.size(); ++index) {
+            auto const next = (index + 1) % vertices.size();
+            auto const v0 = draw.viewport.into(vertices[index]);
+            auto const v1 = draw.viewport.into(vertices[next]);
+            draw.line(v0.x(), v0.y(), v1.x(), v1.y());
+        }
     }
 
     return 0;
