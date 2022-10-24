@@ -12,6 +12,7 @@ namespace player {
         std::vector<mapgen::hex *> occupies;
         long health = 8;
         std::size_t score = {};
+        std::size_t vision = {2};
 
       public:
         snake(mapgen::hex::world_type &);
@@ -20,6 +21,8 @@ namespace player {
 
         update::message
                 move(mapgen::hex::world_type &, planet::hexmap::coordinates by);
+
+        auto vision_distance() const noexcept { return vision; }
     };
 
 

@@ -42,7 +42,7 @@ int main() {
             player.move(world, planet::hexmap::directions[index]);
         }
 
-        draw::world(frame, world, player, 6);
+        draw::world(frame, world, player, player.vision_distance());
     }
 
     return 0;

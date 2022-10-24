@@ -13,6 +13,7 @@ namespace update {
         long length_delta = {};
         long health_delta = {};
         std::size_t score_delta = {};
+        std::size_t vision_distance_delta = {};
     };
 
 

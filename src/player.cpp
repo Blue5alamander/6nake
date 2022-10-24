@@ -11,7 +11,7 @@ update::message player::snake::move(
         mapgen::hex::world_type &world, planet::hexmap::coordinates const by) {
     position = position + by;
     auto &h = world[position];
-    update::message outcome;
+    update::message outcome{};
     if (h.player) {
         outcome.state = update::player::dead_self;
     } else {
@@ -33,6 +33,7 @@ update::message player::snake::move(
         case mapgen::feature::vision_plus:
             outcome.health_delta += 6;
             outcome.score_delta += 9;
+            outcome.vision_distance_delta += 2;
             break;
         case mapgen::feature::rock: outcome.health_delta -= 12; break;
         }
@@ -41,6 +42,7 @@ update::message player::snake::move(
 
     health += outcome.health_delta;
     score += outcome.score_delta;
+    vision += outcome.vision_distance_delta;
 
     auto const length = health / 8;
     while (occupies.size() > length) {
