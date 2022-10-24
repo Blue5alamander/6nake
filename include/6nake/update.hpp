@@ -10,6 +10,9 @@ namespace update {
     struct message {
         player state = player::alive;
         mapgen::feature consumed = mapgen::feature::none;
+        long length_delta = {};
+        long health_delta = {};
+        std::size_t score_delta = {};
     };
 
 

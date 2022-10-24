@@ -10,6 +10,8 @@ namespace player {
 
     class snake {
         std::vector<mapgen::hex *> occupies;
+        long health = 8;
+        std::size_t score = {};
 
       public:
         snake(mapgen::hex::world_type &);
