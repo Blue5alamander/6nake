@@ -5,13 +5,18 @@
 #include <planet/ostream.hpp>
 #include <planet/sdl.hpp>
 
+#include <SDL_ttf.h>
+
 #include <iostream>
 
 
 int main() {
     planet::sdl::init sdl;
+    TTF_Init();
     planet::sdl::window window{sdl, "6nake", 640, 480};
     planet::sdl::renderer renderer{window};
+
+    TTF_Font *font = TTF_OpenFont("Pixellettersfull-BnJ5.ttf", 50);
 
     auto world = mapgen::create_map();
     player::snake player{world};
@@ -52,7 +57,22 @@ int main() {
         }
 
         draw::world(frame, world, player, player.vision_distance());
+        SDL_Color color = {255, 255, 255};
+        SDL_Surface *surface = TTF_RenderText_Solid(
+                font,
+                ("Score: " + std::to_string(player.current_score())).c_str(),
+                color);
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+        int texW = 0;
+        int texH = 0;
+        SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+        SDL_Rect dstrect = {0, 0, texW, texH};
+        SDL_RenderCopy(renderer, texture, nullptr, &dstrect);
+        SDL_DestroyTexture(texture);
+        SDL_FreeSurface(surface);
     }
 
+    TTF_CloseFont(font);
+    TTF_Quit();
     return 0;
 }

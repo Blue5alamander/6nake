@@ -1,9 +1,9 @@
 # 6nake
 
 
-## Build instructions
+## Build instructions for Linux
 
-You'll need to have `cmake`, `build-essential` and `libsdl2-dev` packages.
+You'll need to have `cmake`, `build-essential` and the `libsdl2-dev` and `libsdl2-ttf-dev` packages.
 
 ```bash
 git clone --recursive git@github.com:KayEss/6nake.git
