@@ -43,6 +43,9 @@ update::message player::snake::move(
     health += outcome.health_delta;
     score += outcome.score_delta;
     vision += outcome.vision_distance_delta;
+    if (health <= 0 and outcome.state == update::player::alive) {
+        outcome.state = update::player::dead_health;
+    }
 
     auto const length = health / 8;
     while (occupies.size() > length) {

@@ -23,6 +23,7 @@ namespace player {
                 move(mapgen::hex::world_type &, planet::hexmap::coordinates by);
 
         auto vision_distance() const noexcept { return vision; }
+        auto current_score() const noexcept { return score; }
     };
 
 

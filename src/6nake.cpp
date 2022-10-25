@@ -5,6 +5,8 @@
 #include <planet/ostream.hpp>
 #include <planet/sdl.hpp>
 
+#include <iostream>
+
 
 int main() {
     planet::sdl::init sdl;
@@ -39,7 +41,14 @@ int main() {
         if (towards.mag2() > 2.0f) {
             auto const theta = towards.theta();
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
-            player.move(world, planet::hexmap::directions[index]);
+            auto const outcome =
+                    player.move(world, planet::hexmap::directions[index]);
+
+            if (outcome.state != update::player::alive) {
+                std::cout << "You died. Your final score was "
+                          << player.current_score() << '\n';
+                quit = true;
+            }
         }
 
         draw::world(frame, world, player, player.vision_distance());
