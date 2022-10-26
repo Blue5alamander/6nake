@@ -9,6 +9,7 @@ player::snake::snake(mapgen::hex::world_type &world) {
 
 update::message player::snake::move(
         mapgen::hex::world_type &world, planet::hexmap::coordinates const by) {
+    ++turn;
     position = position + by;
     auto &h = world[position];
     update::message outcome{};
@@ -34,10 +35,17 @@ update::message player::snake::move(
             outcome.health_delta += 6;
             outcome.score_delta += 9;
             outcome.vision_distance_delta += 2;
+            vision_decrease_turn.push_back(turn + 6);
             break;
         case mapgen::feature::rock: outcome.health_delta -= 12; break;
         }
         outcome.consumed = std::exchange(h.features, mapgen::feature::none);
+    }
+
+    if (not vision_decrease_turn.empty()
+        and vision_decrease_turn.front() == turn) {
+        outcome.vision_distance_delta -= 2;
+        vision_decrease_turn.erase(vision_decrease_turn.begin());
     }
 
     health += outcome.health_delta;

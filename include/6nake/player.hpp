@@ -9,10 +9,12 @@ namespace player {
 
 
     class snake {
+        std::size_t turn{};
         std::vector<mapgen::hex *> occupies;
         long health = 8;
         std::size_t score = {};
         std::size_t vision = {2};
+        std::vector<std::size_t> vision_decrease_turn;
 
       public:
         snake(mapgen::hex::world_type &);
