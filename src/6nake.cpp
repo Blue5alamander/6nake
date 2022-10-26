@@ -26,7 +26,12 @@ int main() {
         SDL_WaitEvent(&event);
 
         auto const looking_at = player.position.centre();
-        auto frame = renderer(5, 5, 5, looking_at);
+        auto frame = renderer(5, 5, 5);
+        frame.viewport.translate(-looking_at)
+                .reflect_y()
+                .scale(std::min(window.width(), window.height())
+                       / (1 + 2 * player.vision_distance()))
+                .translate({window.width() / 2.0f, window.height() / 2.0f});
 
         planet::point2d towards{0, 0};
         switch (event.type) {
