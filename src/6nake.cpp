@@ -28,10 +28,10 @@ int main() {
     };
     auto scale = auto_scale();
 
+    auto looking_at = player.position.centre();
+
     for (bool quit = false; not quit;) {
         SDL_Delay(10);
-
-        auto const looking_at = player.position.centre();
 
         auto frame = renderer(5, 5, 5);
         frame.viewport.translate(-looking_at)
@@ -51,7 +51,7 @@ int main() {
                     click_direction = frame.viewport.outof(
                                               {float(event.motion.x),
                                                float(event.motion.y)})
-                            - looking_at;
+                            - player.position.centre();
                     break;
                 }
                 break;
@@ -72,10 +72,27 @@ int main() {
 
         /// Next view location
         auto target_scale = auto_scale();
+        auto scale_movement = 1.75f / target_scale;
         if (target_scale > scale) {
-            scale = std::min(scale + 0.15f, target_scale);
+            scale = std::min(scale + scale_movement, target_scale);
         } else if (target_scale < scale) {
-            scale = std::max(scale - 0.15f, target_scale);
+            scale = std::max(scale - scale_movement, target_scale);
+        }
+        auto const target_look_at = player.position.centre();
+        constexpr float translate_speed = 0.025f;
+        if (target_look_at.x() > looking_at.x()) {
+            looking_at.x(std::min(
+                    looking_at.x() + translate_speed, target_look_at.x()));
+        } else if (target_look_at.x() < looking_at.x()) {
+            looking_at.x(std::max(
+                    looking_at.x() - translate_speed, target_look_at.x()));
+        }
+        if (target_look_at.y() > looking_at.y()) {
+            looking_at.y(std::min(
+                    looking_at.y() + translate_speed, target_look_at.y()));
+        } else if (target_look_at.y() < looking_at.y()) {
+            looking_at.y(std::max(
+                    looking_at.y() - translate_speed, target_look_at.y()));
         }
 
         draw::world(frame, world, player, player.vision_distance());
