@@ -35,7 +35,7 @@ update::message player::snake::move(
             outcome.health_delta += 6;
             outcome.score_delta += 9;
             outcome.vision_distance_delta += 2;
-            vision_decrease_turn.push_back(turn + 6);
+            vision_decrease_turn.push_back(turn + 8);
             break;
         case mapgen::feature::rock: outcome.health_delta -= 12; break;
         }
