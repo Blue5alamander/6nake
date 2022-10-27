@@ -72,7 +72,7 @@ int main() {
 
         /// Next view location
         auto target_scale = auto_scale();
-        auto scale_movement = 1.75f / target_scale;
+        auto scale_movement = 3.5f / target_scale;
         if (target_scale > scale) {
             scale = std::min(scale + scale_movement, target_scale);
         } else if (target_scale < scale) {
