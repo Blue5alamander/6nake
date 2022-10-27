@@ -15,5 +15,5 @@ make -C ./build.tmp
 You can run it straight from the build tree without installing:
 
 ```bash
-./build.tmp/src/6nake
+./build.tmp/6nake
 ```
