@@ -26,6 +26,7 @@ namespace player {
 
         auto vision_distance() const noexcept { return vision; }
         auto current_score() const noexcept { return score; }
+        auto current_health() const noexcept { return health; }
     };
 
 
