@@ -100,7 +100,7 @@ int main() {
                                 .c_str(),
                         {255, 255, 255})};
         auto const dstrect = score.extents();
-        SDL_RenderCopy(renderer, score, nullptr, &dstrect);
+        SDL_RenderCopy(renderer.get(), score.get(), nullptr, &dstrect);
     }
     std::cout << "Your final score was " << player.current_score() << '\n';
 
