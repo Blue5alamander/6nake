@@ -76,7 +76,7 @@ int main() {
             scale = std::max(scale - scale_movement, target_scale);
         }
 
-        constexpr float translate_speed = 0.025f;
+        constexpr float translate_speed = 0.035f;
         constexpr float translate_speed2 = translate_speed * translate_speed;
         auto const target_look_at = player.position.centre();
         auto const direction = target_look_at - looking_at;
