@@ -2,8 +2,8 @@
 
 
 player::snake::snake(mapgen::hex::world_type &world) {
-    occupies.push_back(&world[position]);
-    occupies.back()->player = this;
+    occupies.push_back(position);
+    world[position].player = this;
 }
 
 
@@ -16,8 +16,8 @@ update::message player::snake::move(
     if (h.player) {
         outcome.state = update::player::dead_self;
     } else {
-        occupies.push_back(&world[position]);
-        occupies.back()->player = this;
+        h.player = this;
+        occupies.push_back(position);
         ++outcome.length_delta;
         outcome.health_delta -= 2;
 
@@ -57,7 +57,7 @@ update::message player::snake::move(
 
     auto const length = health / 8;
     while (occupies.size() > length) {
-        occupies.front()->player = nullptr;
+        world[occupies.front()].player = nullptr;
         occupies.erase(occupies.begin());
         --outcome.length_delta;
     }

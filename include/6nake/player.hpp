@@ -10,7 +10,7 @@ namespace player {
 
     class snake {
         std::size_t turn{};
-        std::vector<mapgen::hex *> occupies;
+        std::vector<planet::hexmap::coordinates> occupies;
         long health = 8;
         std::size_t score = {};
         std::size_t vision = {2};
@@ -27,6 +27,11 @@ namespace player {
         auto vision_distance() const noexcept { return vision; }
         auto current_score() const noexcept { return score; }
         auto current_health() const noexcept { return health; }
+
+        std::size_t size() const noexcept { return occupies.size(); }
+        planet::hexmap::coordinates operator[](std::size_t s) const {
+            return occupies[s];
+        }
     };
 
 
