@@ -36,7 +36,7 @@ int main() {
                 .scale(scale)
                 .translate({window.width() / 2.0f, window.height() / 2.0f});
 
-        planet::point2d click_direction{0, 0};
+        planet::affine::point2d click_direction{0, 0};
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -83,7 +83,7 @@ int main() {
         if (direction.mag2() <= translate_speed2) {
             looking_at = target_look_at;
         } else {
-            auto const translate = planet::point2d::from_polar(
+            auto const translate = planet::affine::point2d::from_polar(
                     translate_speed, direction.theta());
             looking_at = looking_at + translate;
         }
