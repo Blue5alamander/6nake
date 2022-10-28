@@ -75,21 +75,17 @@ int main() {
         } else if (target_scale < scale) {
             scale = std::max(scale - scale_movement, target_scale);
         }
-        auto const target_look_at = player.position.centre();
+
         constexpr float translate_speed = 0.025f;
-        if (target_look_at.x() > looking_at.x()) {
-            looking_at.x(std::min(
-                    looking_at.x() + translate_speed, target_look_at.x()));
-        } else if (target_look_at.x() < looking_at.x()) {
-            looking_at.x(std::max(
-                    looking_at.x() - translate_speed, target_look_at.x()));
-        }
-        if (target_look_at.y() > looking_at.y()) {
-            looking_at.y(std::min(
-                    looking_at.y() + translate_speed, target_look_at.y()));
-        } else if (target_look_at.y() < looking_at.y()) {
-            looking_at.y(std::max(
-                    looking_at.y() - translate_speed, target_look_at.y()));
+        constexpr float translate_speed2 = translate_speed * translate_speed;
+        auto const target_look_at = player.position.centre();
+        auto const direction = target_look_at - looking_at;
+        if (direction.mag2() <= translate_speed2) {
+            looking_at = target_look_at;
+        } else {
+            auto const translate = planet::point2d::from_polar(
+                    translate_speed, direction.theta());
+            looking_at = looking_at + translate;
         }
 
         draw::world(frame, world, player, player.vision_distance());
