@@ -36,10 +36,7 @@ void draw::world(
             if (player.position == loc) {
                 draw.colour(0, 255, 0);
                 draw_hex(draw, loc, 0.8f);
-            } else if (cell.player) {
-                draw.colour(0, 255, 0);
-                draw_hex(draw, loc, 0.6f);
-            } else {
+            } else if (not cell.player) {
                 switch (cell.features) {
                 case mapgen::feature::none:
                     draw.colour(120, 120, 120);
@@ -64,6 +61,13 @@ void draw::world(
                     draw_hex(draw, loc, 0.4f);
                     break;
                 }
+            }
+        }
+        if (player.size()) {
+            draw.colour(0, 255, 0);
+            for (std::size_t index{}; index < player.size() - 1; ++index) {
+                auto const p = player[index];
+                draw_hex(draw, p, 0.6f);
             }
         }
     }
