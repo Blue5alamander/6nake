@@ -68,6 +68,7 @@ void draw::world(
             for (std::size_t index{}; index < player.size() - 1; ++index) {
                 auto const p = player[index];
                 draw_hex(draw, p, 0.6f);
+                draw.line(p.centre(), player[index + 1].centre());
             }
         }
     }
