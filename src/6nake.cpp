@@ -95,8 +95,7 @@ int main() {
                         ("Score: " + std::to_string(player.current_score()))
                                 .c_str(),
                         {255, 255, 255})};
-        auto const score_size = score.extents();
-        SDL_RenderCopy(renderer.get(), score.get(), nullptr, &score_size);
+        frame.copy(score, 0, 0);
         planet::sdl::texture health{
                 renderer,
                 font.render(
@@ -104,10 +103,7 @@ int main() {
                                 .c_str(),
                         {255, 255, 255})};
         auto const health_size = health.extents();
-        SDL_Rect health_pos = {
-                int(window.width()) - health_size.w, 0, health_size.w,
-                health_size.h};
-        SDL_RenderCopy(renderer.get(), health.get(), nullptr, &health_pos);
+        frame.copy(health, window.width() - health_size.w, 0);
     }
     std::cout << "Your final score was " << player.current_score() << '\n';
 
