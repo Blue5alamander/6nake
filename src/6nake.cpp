@@ -11,7 +11,7 @@
 int main() {
     planet::sdl::init sdl;
     planet::sdl::ttf text{sdl};
-    planet::sdl::window window{sdl, "6nake", 640, 480};
+    planet::sdl::window window{sdl, "6nake", SDL_WINDOW_FULLSCREEN_DESKTOP};
     planet::sdl::font font{"Pixellettersfull-BnJ5.ttf", window.height() / 10};
     planet::sdl::renderer renderer{window};
 
