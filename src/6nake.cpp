@@ -93,19 +93,14 @@ int main() {
         }
 
         draw::world(frame, world, player, player.vision_distance());
-        SDL_Color color = {255, 255, 255};
-        SDL_Surface *surface = TTF_RenderText_Solid(
-                font,
-                ("Score: " + std::to_string(player.current_score())).c_str(),
-                color);
-        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-        int texW = 0;
-        int texH = 0;
-        SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-        SDL_Rect dstrect = {0, 0, texW, texH};
-        SDL_RenderCopy(renderer, texture, nullptr, &dstrect);
-        SDL_DestroyTexture(texture);
-        SDL_FreeSurface(surface);
+        planet::sdl::texture score{
+                renderer,
+                font.render(
+                        ("Score: " + std::to_string(player.current_score()))
+                                .c_str(),
+                        {255, 255, 255})};
+        auto const dstrect = score.extents();
+        SDL_RenderCopy(renderer, score, nullptr, &dstrect);
     }
     std::cout << "Your final score was " << player.current_score() << '\n';
 
