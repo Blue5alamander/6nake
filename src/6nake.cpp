@@ -55,7 +55,7 @@ int main() {
             }
         }
 
-        if (click_direction.mag2() > 2.0f) {
+        if (click_direction.mag2() > 1.0f) {
             auto const theta = click_direction.theta();
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
             auto const outcome =
