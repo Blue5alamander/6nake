@@ -19,7 +19,6 @@ update::message player::snake::move(
         h.player = this;
         occupies.push_back(position);
         ++outcome.length_delta;
-        outcome.health_delta -= 2;
 
         switch (h.features) {
         case mapgen::feature::none: break;
@@ -28,11 +27,11 @@ update::message player::snake::move(
             outcome.score_delta += 5;
             break;
         case mapgen::feature::food_plus:
-            outcome.health_delta += 14;
+            outcome.health_delta += 16;
             outcome.score_delta += 6;
             break;
         case mapgen::feature::vision_plus:
-            outcome.health_delta += 6;
+            outcome.health_delta += 4;
             outcome.score_delta += 9;
             outcome.vision_distance_delta += 2;
             vision_decrease_turn.push_back(turn + 8);
