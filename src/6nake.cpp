@@ -69,12 +69,8 @@ int main() {
 
         /// Next view location
         auto target_scale = auto_scale();
-        auto scale_movement = 3.5f / target_scale;
-        if (target_scale > scale) {
-            scale = std::min(scale + scale_movement, target_scale);
-        } else if (target_scale < scale) {
-            scale = std::max(scale - scale_movement, target_scale);
-        }
+        auto const scale_difference = target_scale - scale;
+        scale += scale_difference * 0.15f;
 
         constexpr float translate_speed = 0.035f;
         constexpr float translate_speed2 = translate_speed * translate_speed;
