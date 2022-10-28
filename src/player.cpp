@@ -19,6 +19,7 @@ update::message player::snake::move(
         h.player = this;
         occupies.push_back(position);
         ++outcome.length_delta;
+        outcome.health_delta -= 1;
 
         switch (h.features) {
         case mapgen::feature::none: break;
