@@ -3,8 +3,6 @@
 
 #include <felspar/coro/start.hpp>
 
-#include <iostream>
-
 
 using namespace std::literals;
 
@@ -75,10 +73,7 @@ felspar::coro::task<update::message> game::round::play() {
             auto const outcome =
                     player.move(world, planet::hexmap::directions[index]);
 
-            if (outcome.state != update::player::alive) {
-                std::cout << "You died. ";
-                co_return outcome;
-            }
+            if (outcome.state != update::player::alive) { co_return outcome; }
         }
     }
     co_return {};
@@ -180,5 +175,4 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
         auto const health_size = health.extents();
         frame.copy(health, game.window.width() - health_size.w, 0);
     }
-    std::cout << "Your final score was " << player.current_score() << '\n';
 }
