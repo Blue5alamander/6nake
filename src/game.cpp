@@ -163,7 +163,7 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
             looking_at = target_look_at;
         } else {
             auto const translate = planet::affine::point2d::from_polar(
-                    translate_speed, direction.theta());
+                    std::sqrt(direction.mag2()) * 0.1f, direction.theta());
             looking_at = looking_at + translate;
         }
 
