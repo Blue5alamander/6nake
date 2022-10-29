@@ -1,6 +1,8 @@
 #include <6nake/draw.hpp>
 #include <6nake/game.hpp>
 
+#include <felspar/coro/start.hpp>
+
 #include <iostream>
 
 
@@ -20,11 +22,37 @@ game::main::main(planet::sdl::init &i)
 
 
 felspar::coro::task<int> game::main::run() {
+    felspar::coro::starter ui;
+    ui.post(*this, &main::interface);
+
+    while (true) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT: co_return 0;
+            case SDL_MOUSEBUTTONUP:
+                switch (event.button.button) {
+                case SDL_BUTTON_LEFT:
+                    mouse_click = planet::affine::point2d{
+                            float(event.motion.x), float(event.motion.y)};
+                    break;
+                }
+                break;
+            }
+        }
+        ui.garbage_collect_completed();
+        if (ui.empty()) { co_return 0; }
+        co_await sdl.io.sleep(50ms);
+    }
+}
+
+
+felspar::coro::task<void> game::main::interface() {
     while (true) {
         game::round round{*this};
         auto outcome = co_await round.play();
         switch (outcome.state) {
-        case update::player::alive: co_return 0;
+        case update::player::alive: co_return;
         case update::player::dead_self: [[fallthrough]];
         case update::player::dead_health:
             co_await round.died(outcome.state);
@@ -81,19 +109,7 @@ felspar::coro::task<void> game::round::died(update::player reason) {
                         {game.window.width() / 2.0f,
                          game.window.height() / 2.0f});
 
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: quit = true; break;
-            case SDL_MOUSEBUTTONUP:
-                switch (event.button.button) {
-                case SDL_BUTTON_LEFT:
-                    /// TODO Finish when clicked after pause
-                    break;
-                }
-                break;
-            }
-        }
+        auto click = std::exchange(game.mouse_click, {});
 
         draw::world(frame, world, player, player.vision_distance());
         planet::sdl::texture texture{game.renderer, text};
@@ -125,20 +141,9 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
                         {game.window.width() / 2.0f,
                          game.window.height() / 2.0f});
 
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: quit = true; break;
-            case SDL_MOUSEBUTTONUP:
-                switch (event.button.button) {
-                case SDL_BUTTON_LEFT:
-                    co_yield frame.viewport.outof(
-                            {float(event.motion.x), float(event.motion.y)})
-                            - player.position.centre();
-                    break;
-                }
-                break;
-            }
+        auto click = std::exchange(game.mouse_click, {});
+        if (click) {
+            co_yield frame.viewport.outof(*click) - player.position.centre();
         }
 
         /// Next view location
