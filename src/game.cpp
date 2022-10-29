@@ -96,7 +96,10 @@ felspar::coro::task<void> game::round::died(update::player reason) {
     for (bool quit = false; not quit;) {
         co_await game.sdl.io.sleep(10ms);
 
-        auto frame = game.renderer(5, 5, 5);
+        game.renderer.colour(5, 5, 5);
+        game.renderer.clear();
+
+        auto frame = planet::sdl::drawframe{game.renderer};
         frame.viewport.translate(-looking_at)
                 .reflect_y()
                 .scale(scale)
@@ -106,12 +109,15 @@ felspar::coro::task<void> game::round::died(update::player reason) {
 
         auto click = std::exchange(game.mouse_click, {});
 
-        draw::world(frame, world, player, player.vision_distance());
+        draw::world(
+                game.renderer, frame, world, player, player.vision_distance());
         planet::sdl::texture texture{game.renderer, text};
         auto const text_size = texture.extents();
-        frame.copy(
+        game.renderer.copy(
                 texture, (game.window.width() - text_size.w) / 2,
                 game.window.height() / 3);
+
+        game.renderer.present();
     }
     co_return;
 }
@@ -128,7 +134,10 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
     for (bool quit = false; not quit;) {
         co_await game.sdl.io.sleep(10ms);
 
-        auto frame = game.renderer(5, 5, 5);
+        game.renderer.colour(5, 5, 5);
+        game.renderer.clear();
+        auto frame = planet::sdl::drawframe{game.renderer};
+
         frame.viewport.translate(-looking_at)
                 .reflect_y()
                 .scale(scale)
@@ -158,14 +167,15 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
             looking_at = looking_at + translate;
         }
 
-        draw::world(frame, world, player, player.vision_distance());
+        draw::world(
+                game.renderer, frame, world, player, player.vision_distance());
         planet::sdl::texture score{
                 game.renderer,
                 game.font.render(
                         ("Score: " + std::to_string(player.current_score()))
                                 .c_str(),
                         {255, 255, 255})};
-        frame.copy(score, 0, 0);
+        game.renderer.copy(score, 0, 0);
         planet::sdl::texture health{
                 game.renderer,
                 game.font.render(
@@ -173,6 +183,8 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
                                 .c_str(),
                         {255, 255, 255})};
         auto const health_size = health.extents();
-        frame.copy(health, game.window.width() - health_size.w, 0);
+        game.renderer.copy(health, game.window.width() - health_size.w, 0);
+
+        game.renderer.present();
     }
 }

@@ -10,10 +10,11 @@ namespace draw {
 
 
     void
-            world(planet::sdl::drawframe &draw,
-                  mapgen::hex::world_type const &world,
-                  player::snake const &player,
-                  long range);
+            world(planet::sdl::renderer &,
+                  planet::sdl::drawframe &,
+                  mapgen::hex::world_type const &,
+                  player::snake const &,
+                  long vision_range);
 
 
 }
