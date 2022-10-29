@@ -8,6 +8,7 @@ add_subdirectory(libs)
 add_executable(6nake
         src/6nake.cpp
         src/draw.cpp
+        src/game.cpp
         src/mapgen.cpp
         src/player.cpp
     )
