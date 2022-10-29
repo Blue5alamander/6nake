@@ -16,3 +16,6 @@
 [submodule "libs/planet-sdl"]
 	path = libs/planet-sdl
 	url = git@github.com:KayEss/planet-sdl.git
+[submodule "libs/io"]
+	path = libs/io
+	url = git@github.com:Felspar/io.git
