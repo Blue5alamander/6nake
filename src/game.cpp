@@ -4,6 +4,9 @@
 #include <iostream>
 
 
+using namespace std::literals;
+
+
 /**
  * `game::main`
  */
@@ -57,7 +60,7 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
     auto looking_at = player.position.centre();
 
     for (bool quit = false; not quit;) {
-        SDL_Delay(10);
+        co_await game.sdl.io.sleep(10ms);
 
         auto frame = game.renderer(5, 5, 5);
         frame.viewport.translate(-looking_at)
