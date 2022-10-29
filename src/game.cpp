@@ -20,9 +20,17 @@ game::main::main(planet::sdl::init &i)
 
 
 felspar::coro::task<int> game::main::run() {
-    game::round round{*this};
-    co_await round.play();
-    co_return 0;
+    while (true) {
+        game::round round{*this};
+        auto outcome = co_await round.play();
+        switch (outcome.state) {
+        case update::player::alive: co_return 0;
+        case update::player::dead_self: [[fallthrough]];
+        case update::player::dead_health:
+            co_await round.died(outcome.state);
+            break;
+        }
+    }
 }
 
 
@@ -49,16 +57,63 @@ felspar::coro::task<update::message> game::round::play() {
 }
 
 
+felspar::coro::task<void> game::round::died(update::player reason) {
+    char const *explanation = nullptr;
+    switch (reason) {
+    case update::player::alive: co_return; // This shouldn't have happened
+    case update::player::dead_self:
+        explanation = "You can't eat yourself, so you died!";
+        break;
+    case update::player::dead_health:
+        explanation = "You ran out of health and died from exhaustion";
+        break;
+    }
+    auto const text = game.font.render(explanation, {255, 255, 255});
+
+    for (bool quit = false; not quit;) {
+        co_await game.sdl.io.sleep(10ms);
+
+        auto frame = game.renderer(5, 5, 5);
+        frame.viewport.translate(-looking_at)
+                .reflect_y()
+                .scale(scale)
+                .translate(
+                        {game.window.width() / 2.0f,
+                         game.window.height() / 2.0f});
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT: quit = true; break;
+            case SDL_MOUSEBUTTONUP:
+                switch (event.button.button) {
+                case SDL_BUTTON_LEFT:
+                    /// TODO Finish when clicked after pause
+                    break;
+                }
+                break;
+            }
+        }
+
+        draw::world(frame, world, player, player.vision_distance());
+        planet::sdl::texture texture{game.renderer, text};
+        auto const text_size = texture.extents();
+        frame.copy(
+                texture, (game.window.width() - text_size.w) / 2,
+                game.window.height() / 3);
+    }
+    co_return;
+}
+
+
+float game::round::calculate_auto_scale_factor() const {
+    return std::min(game.window.width(), game.window.height())
+            / (1.0f + 2.0f * player.vision_distance());
+}
+
+
 felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
     /// Auto scaling with scaling animation
-    auto const auto_scale = [this]() {
-        return std::min(game.window.width(), game.window.height())
-                / (1.0f + 2.0f * player.vision_distance());
-    };
-    auto scale = auto_scale();
-
-    auto looking_at = player.position.centre();
-
     for (bool quit = false; not quit;) {
         co_await game.sdl.io.sleep(10ms);
 
@@ -87,7 +142,7 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
         }
 
         /// Next view location
-        auto target_scale = auto_scale();
+        auto target_scale = calculate_auto_scale_factor();
         auto const scale_difference = target_scale - scale;
         scale += scale_difference * 0.15f;
 
