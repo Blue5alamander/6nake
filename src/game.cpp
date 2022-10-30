@@ -15,8 +15,7 @@ using namespace std::literals;
 game::main::main(planet::sdl::init &i)
 : sdl{i},
   window{sdl, "6nake", SDL_WINDOW_FULLSCREEN_DESKTOP},
-  font{"Pixellettersfull-BnJ5.ttf", window.height() / 10},
-  renderer{window} {}
+  font{"Pixellettersfull-BnJ5.ttf", window.height() / 10} {}
 
 
 felspar::coro::task<int> game::main::run() {
@@ -66,7 +65,7 @@ felspar::coro::task<void> game::main::interface() {
 
 
 game::round::round(main &g) : game{g} {
-    rendering.post(*this, &round::renderer);
+    renderer.connect(*this, &round::render);
 }
 
 
@@ -99,8 +98,8 @@ felspar::coro::task<void> game::round::died(update::player reason) {
     auto const text = game.font.render(explanation, {255, 255, 255});
 
     for (bool quit = false; not quit;) {
-        game.renderer.colour(5, 5, 5);
-        game.renderer.clear();
+        renderer.colour(5, 5, 5);
+        renderer.clear();
 
         arena.viewport = {};
         arena.viewport.translate(-looking_at)
@@ -110,15 +109,14 @@ felspar::coro::task<void> game::round::died(update::player reason) {
                         {game.window.width() / 2.0f,
                          game.window.height() / 2.0f});
 
-        draw::world(
-                game.renderer, arena, world, player, player.vision_distance());
-        planet::sdl::texture texture{game.renderer, text};
+        draw::world(renderer, arena, world, player, player.vision_distance());
+        planet::sdl::texture texture{renderer, text};
         auto const text_size = texture.extents();
-        game.renderer.copy(
+        renderer.copy(
                 texture, (game.window.width() - text_size.w) / 2,
                 game.window.height() / 3);
 
-        game.renderer.present();
+        renderer.present();
         co_await game.sdl.io.sleep(10ms);
     }
     co_return;
@@ -137,16 +135,19 @@ felspar::coro::stream<planet::affine::point2d> game::round::clicks() {
         if (click) {
             co_yield arena.viewport.outof(*click) - player.position.centre();
         }
-        co_await game.sdl.io.sleep(10ms);
+        co_await renderer.next_frame();
     }
 }
 
 
-felspar::coro::task<void> game::round::renderer() {
+felspar::coro::stream<planet::sdl::renderer::frame> game::round::render() {
+    std::size_t number{};
     /// Auto scaling with scaling animation
     for (bool quit = false; not quit;) {
-        game.renderer.colour(5, 5, 5);
-        game.renderer.clear();
+        ++number;
+
+        renderer.colour(5, 5, 5);
+        renderer.clear();
 
         arena.viewport = {};
         arena.viewport.translate(-looking_at)
@@ -156,9 +157,7 @@ felspar::coro::task<void> game::round::renderer() {
                         {game.window.width() / 2.0f,
                          game.window.height() / 2.0f});
 
-        /// Next view location
-        auto target_scale = calculate_auto_scale_factor();
-        auto const scale_difference = target_scale - scale;
+        auto const scale_difference = calculate_auto_scale_factor() - scale;
         scale += scale_difference * 0.15f;
 
         auto const target_look_at = player.position.centre();
@@ -171,25 +170,25 @@ felspar::coro::task<void> game::round::renderer() {
             looking_at = looking_at + translate;
         }
 
-        draw::world(
-                game.renderer, arena, world, player, player.vision_distance());
+        draw::world(renderer, arena, world, player, player.vision_distance());
         planet::sdl::texture score{
-                game.renderer,
+                renderer,
                 game.font.render(
                         ("Score: " + std::to_string(player.current_score()))
                                 .c_str(),
                         {255, 255, 255})};
-        game.renderer.copy(score, 0, 0);
+        renderer.copy(score, 0, 0);
         planet::sdl::texture health{
-                game.renderer,
+                renderer,
                 game.font.render(
                         ("Health: " + std::to_string(player.current_health()))
                                 .c_str(),
                         {255, 255, 255})};
         auto const health_size = health.extents();
-        game.renderer.copy(health, game.window.width() - health_size.w, 0);
+        renderer.copy(health, game.window.width() - health_size.w, 0);
 
-        game.renderer.present();
+        renderer.present();
+        co_yield planet::sdl::renderer::frame{number};
         co_await game.sdl.io.sleep(10ms);
     }
 }

@@ -17,7 +17,6 @@ namespace game {
         planet::sdl::init &sdl;
         planet::sdl::window window;
         planet::sdl::font font;
-        planet::sdl::renderer renderer;
 
         main(planet::sdl::init &);
 
@@ -43,13 +42,13 @@ namespace game {
         player::snake player = {world};
         planet::affine::point2d looking_at = player.position.centre();
         float scale = calculate_auto_scale_factor();
-        planet::sdl::drawframe arena = {game.renderer};
+        planet::sdl::renderer renderer = {game.window};
+        planet::sdl::drawframe arena = {renderer};
 
         felspar::coro::stream<planet::affine::point2d> clicks();
 
-        felspar::coro::starter<> rendering;
         float calculate_auto_scale_factor() const;
-        felspar::coro::task<void> renderer();
+        felspar::coro::stream<planet::sdl::renderer::frame> render();
     };
 
 
