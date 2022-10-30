@@ -65,6 +65,9 @@ felspar::coro::task<void> game::main::interface() {
  */
 
 
+game::round::round(main &g) : game{g} {}
+
+
 felspar::coro::task<update::message> game::round::play() {
     for (auto moves = renderer(); auto move = co_await moves.next();) {
         if (move->mag2() > 1.0f) {
@@ -94,13 +97,11 @@ felspar::coro::task<void> game::round::died(update::player reason) {
     auto const text = game.font.render(explanation, {255, 255, 255});
 
     for (bool quit = false; not quit;) {
-        co_await game.sdl.io.sleep(10ms);
-
         game.renderer.colour(5, 5, 5);
         game.renderer.clear();
 
-        auto frame = planet::sdl::drawframe{game.renderer};
-        frame.viewport.translate(-looking_at)
+        arena.viewport = {};
+        arena.viewport.translate(-looking_at)
                 .reflect_y()
                 .scale(scale)
                 .translate(
@@ -110,7 +111,7 @@ felspar::coro::task<void> game::round::died(update::player reason) {
         auto click = std::exchange(game.mouse_click, {});
 
         draw::world(
-                game.renderer, frame, world, player, player.vision_distance());
+                game.renderer, arena, world, player, player.vision_distance());
         planet::sdl::texture texture{game.renderer, text};
         auto const text_size = texture.extents();
         game.renderer.copy(
@@ -118,6 +119,7 @@ felspar::coro::task<void> game::round::died(update::player reason) {
                 game.window.height() / 3);
 
         game.renderer.present();
+        co_await game.sdl.io.sleep(10ms);
     }
     co_return;
 }
@@ -132,13 +134,11 @@ float game::round::calculate_auto_scale_factor() const {
 felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
     /// Auto scaling with scaling animation
     for (bool quit = false; not quit;) {
-        co_await game.sdl.io.sleep(10ms);
-
         game.renderer.colour(5, 5, 5);
         game.renderer.clear();
-        auto frame = planet::sdl::drawframe{game.renderer};
 
-        frame.viewport.translate(-looking_at)
+        arena.viewport = {};
+        arena.viewport.translate(-looking_at)
                 .reflect_y()
                 .scale(scale)
                 .translate(
@@ -147,7 +147,7 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
 
         auto click = std::exchange(game.mouse_click, {});
         if (click) {
-            co_yield frame.viewport.outof(*click) - player.position.centre();
+            co_yield arena.viewport.outof(*click) - player.position.centre();
         }
 
         /// Next view location
@@ -168,7 +168,7 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
         }
 
         draw::world(
-                game.renderer, frame, world, player, player.vision_distance());
+                game.renderer, arena, world, player, player.vision_distance());
         planet::sdl::texture score{
                 game.renderer,
                 game.font.render(
@@ -186,5 +186,6 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
         game.renderer.copy(health, game.window.width() - health_size.w, 0);
 
         game.renderer.present();
+        co_await game.sdl.io.sleep(10ms);
     }
 }
