@@ -161,11 +161,9 @@ felspar::coro::task<void> game::round::renderer() {
         auto const scale_difference = target_scale - scale;
         scale += scale_difference * 0.15f;
 
-        constexpr float translate_speed = 0.035f;
-        constexpr float translate_speed2 = translate_speed * translate_speed;
         auto const target_look_at = player.position.centre();
         auto const direction = target_look_at - looking_at;
-        if (direction.mag2() <= translate_speed2) {
+        if (direction.mag2() <= 0.0001f) {
             looking_at = target_look_at;
         } else {
             auto const translate = planet::affine::point2d::from_polar(
