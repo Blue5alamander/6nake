@@ -6,6 +6,7 @@
 
 #include <planet/sdl.hpp>
 
+#include <felspar/coro/start.hpp>
 #include <felspar/coro/stream.hpp>
 
 
@@ -44,8 +45,11 @@ namespace game {
         float scale = calculate_auto_scale_factor();
         planet::sdl::drawframe arena = {game.renderer};
 
+        felspar::coro::stream<planet::affine::point2d> clicks();
+
+        felspar::coro::starter<> rendering;
         float calculate_auto_scale_factor() const;
-        felspar::coro::stream<planet::affine::point2d> renderer();
+        felspar::coro::task<void> renderer();
     };
 
 

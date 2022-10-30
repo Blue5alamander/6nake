@@ -65,11 +65,13 @@ felspar::coro::task<void> game::main::interface() {
  */
 
 
-game::round::round(main &g) : game{g} {}
+game::round::round(main &g) : game{g} {
+    rendering.post(*this, &round::renderer);
+}
 
 
 felspar::coro::task<update::message> game::round::play() {
-    for (auto moves = renderer(); auto move = co_await moves.next();) {
+    for (auto moves = clicks(); auto move = co_await moves.next();) {
         if (move->mag2() > 1.0f) {
             auto const theta = move->theta();
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
@@ -108,8 +110,6 @@ felspar::coro::task<void> game::round::died(update::player reason) {
                         {game.window.width() / 2.0f,
                          game.window.height() / 2.0f});
 
-        auto click = std::exchange(game.mouse_click, {});
-
         draw::world(
                 game.renderer, arena, world, player, player.vision_distance());
         planet::sdl::texture texture{game.renderer, text};
@@ -131,7 +131,18 @@ float game::round::calculate_auto_scale_factor() const {
 }
 
 
-felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
+felspar::coro::stream<planet::affine::point2d> game::round::clicks() {
+    while (true) {
+        auto click = std::exchange(game.mouse_click, {});
+        if (click) {
+            co_yield arena.viewport.outof(*click) - player.position.centre();
+        }
+        co_await game.sdl.io.sleep(10ms);
+    }
+}
+
+
+felspar::coro::task<void> game::round::renderer() {
     /// Auto scaling with scaling animation
     for (bool quit = false; not quit;) {
         game.renderer.colour(5, 5, 5);
@@ -144,11 +155,6 @@ felspar::coro::stream<planet::affine::point2d> game::round::renderer() {
                 .translate(
                         {game.window.width() / 2.0f,
                          game.window.height() / 2.0f});
-
-        auto click = std::exchange(game.mouse_click, {});
-        if (click) {
-            co_yield arena.viewport.outof(*click) - player.position.centre();
-        }
 
         /// Next view location
         auto target_scale = calculate_auto_scale_factor();
