@@ -45,6 +45,8 @@ namespace game {
         planet::sdl::renderer renderer = {game.window};
         planet::sdl::drawframe arena = {renderer};
 
+        std::function<void(void)> hud;
+
         felspar::coro::stream<planet::affine::point2d> clicks();
 
         float calculate_auto_scale_factor() const;

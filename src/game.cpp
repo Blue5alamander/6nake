@@ -70,6 +70,23 @@ game::round::round(main &g) : game{g} {
 
 
 felspar::coro::task<update::message> game::round::play() {
+    hud = [this]() {
+        planet::sdl::texture score{
+                renderer,
+                game.font.render(
+                        ("Score: " + std::to_string(player.current_score()))
+                                .c_str(),
+                        {255, 255, 255})};
+        renderer.copy(score, 0, 0);
+        planet::sdl::texture health{
+                renderer,
+                game.font.render(
+                        ("Health: " + std::to_string(player.current_health()))
+                                .c_str(),
+                        {255, 255, 255})};
+        auto const health_size = health.extents();
+        renderer.copy(health, game.window.width() - health_size.w, 0);
+    };
     for (auto moves = clicks(); auto move = co_await moves.next();) {
         if (move->mag2() > 1.0f) {
             auto const theta = move->theta();
@@ -95,31 +112,29 @@ felspar::coro::task<void> game::round::died(update::player reason) {
         explanation = "You ran out of health and died from exhaustion";
         break;
     }
-    auto const text = game.font.render(explanation, {255, 255, 255});
+    auto const text = planet::sdl::texture{
+            renderer, game.font.render(explanation, {255, 255, 255})};
 
-    for (bool quit = false; not quit;) {
-        renderer.colour(5, 5, 5);
-        renderer.clear();
+    auto const score = planet::sdl::texture{
+            renderer,
+            game.font.render(
+                    ("Your final score: "
+                     + std::to_string(player.current_score()))
+                            .c_str(),
+                    {255, 255, 255})};
 
-        arena.viewport = {};
-        arena.viewport.translate(-looking_at)
-                .reflect_y()
-                .scale(scale)
-                .translate(
-                        {game.window.width() / 2.0f,
-                         game.window.height() / 2.0f});
-
-        draw::world(renderer, arena, world, player, player.vision_distance());
-        planet::sdl::texture texture{renderer, text};
-        auto const text_size = texture.extents();
+    hud = [this, &text, &score]() {
+        auto const score_size = score.extents();
         renderer.copy(
-                texture, (game.window.width() - text_size.w) / 2,
-                game.window.height() / 3);
+                score, (game.window.width() - score_size.w) / 2,
+                2 * game.window.height() / 3);
 
-        renderer.present();
-        co_await game.sdl.io.sleep(10ms);
-    }
-    co_return;
+        auto const text_size = text.extents();
+        renderer.copy(
+                text, (game.window.width() - text_size.w) / 2,
+                game.window.height() / 3);
+    };
+    co_await game.sdl.io.sleep(2s);
 }
 
 
@@ -171,21 +186,7 @@ felspar::coro::stream<planet::sdl::renderer::frame> game::round::render() {
         }
 
         draw::world(renderer, arena, world, player, player.vision_distance());
-        planet::sdl::texture score{
-                renderer,
-                game.font.render(
-                        ("Score: " + std::to_string(player.current_score()))
-                                .c_str(),
-                        {255, 255, 255})};
-        renderer.copy(score, 0, 0);
-        planet::sdl::texture health{
-                renderer,
-                game.font.render(
-                        ("Health: " + std::to_string(player.current_health()))
-                                .c_str(),
-                        {255, 255, 255})};
-        auto const health_size = health.extents();
-        renderer.copy(health, game.window.width() - health_size.w, 0);
+        if (hud) { hud(); }
 
         renderer.present();
         co_yield planet::sdl::renderer::frame{number};
