@@ -87,17 +87,25 @@ felspar::coro::task<update::message> game::round::play() {
         auto const health_size = health.extents();
         renderer.copy(health, game.window.width() - health_size.w, 0);
     };
-    for (auto moves = clicks(); auto move = co_await moves.next();) {
-        if (move->mag2() > 1.0f) {
-            auto const theta = move->theta();
-            auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
-            auto const outcome =
-                    player.move(world, planet::hexmap::directions[index]);
+    while (true) {
+        auto click = std::exchange(game.mouse_click, {});
+        if (click) {
+            auto const move =
+                    arena.viewport.outof(*click) - player.position.centre();
+            if (move.mag2() > 1.0f) {
+                auto const theta = move.theta();
+                auto const index =
+                        std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
+                auto const outcome =
+                        player.move(world, planet::hexmap::directions[index]);
 
-            if (outcome.state != update::player::alive) { co_return outcome; }
+                if (outcome.state != update::player::alive) {
+                    co_return outcome;
+                }
+            }
         }
+        co_await renderer.next_frame();
     }
-    co_return {};
 }
 
 
@@ -141,17 +149,6 @@ felspar::coro::task<void> game::round::died(update::player reason) {
 float game::round::calculate_auto_scale_factor() const {
     return std::min(game.window.width(), game.window.height())
             / (1.0f + 2.0f * player.vision_distance());
-}
-
-
-felspar::coro::stream<planet::affine::point2d> game::round::clicks() {
-    while (true) {
-        auto click = std::exchange(game.mouse_click, {});
-        if (click) {
-            co_yield arena.viewport.outof(*click) - player.position.centre();
-        }
-        co_await renderer.next_frame();
-    }
 }
 
 

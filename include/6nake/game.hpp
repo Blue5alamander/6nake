@@ -47,8 +47,6 @@ namespace game {
 
         std::function<void(void)> hud;
 
-        felspar::coro::stream<planet::affine::point2d> clicks();
-
         float calculate_auto_scale_factor() const;
         felspar::coro::stream<planet::sdl::renderer::frame> render();
     };
