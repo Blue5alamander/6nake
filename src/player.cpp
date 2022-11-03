@@ -13,14 +13,15 @@ update::message player::snake::move(
     position = position + by;
     auto &h = world[position];
     update::message outcome{};
+
+    occupies.push_back(position);
+    ++outcome.length_delta;
+    outcome.health_delta -= 1;
+
     if (h.player) {
         outcome.state = update::player::dead_self;
     } else {
         h.player = this;
-        occupies.push_back(position);
-        ++outcome.length_delta;
-        outcome.health_delta -= 1;
-
         switch (h.features) {
         case mapgen::feature::none: break;
         case mapgen::feature::food:
@@ -53,13 +54,13 @@ update::message player::snake::move(
     vision += outcome.vision_distance_delta;
     if (health <= 0 and outcome.state == update::player::alive) {
         outcome.state = update::player::dead_health;
-    }
-
-    auto const length = health / 8;
-    while (occupies.size() > length) {
-        world[occupies.front()].player = nullptr;
-        occupies.erase(occupies.begin());
-        --outcome.length_delta;
+    } else if (outcome.state == update::player::alive) {
+        auto const length = health / 8;
+        while (occupies.size() > length) {
+            world[occupies.front()].player = nullptr;
+            occupies.erase(occupies.begin());
+            --outcome.length_delta;
+        }
     }
 
     return outcome;
