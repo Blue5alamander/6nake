@@ -5,7 +5,7 @@
 namespace {
     void draw_hex(
             planet::sdl::renderer &renderer,
-            planet::sdl::drawframe &draw,
+            planet::sdl::panel &draw,
             planet::hexmap::coordinates const loc,
             float const radius) {
         auto const vertices = loc.vertices(1.0f, radius);
@@ -22,7 +22,7 @@ namespace {
 
 void draw::world(
         planet::sdl::renderer &renderer,
-        planet::sdl::drawframe &draw,
+        planet::sdl::panel &draw,
         mapgen::hex::world_type const &world,
         player::snake const &player,
         long const range) {

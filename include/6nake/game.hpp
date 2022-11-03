@@ -43,7 +43,7 @@ namespace game {
         planet::affine::point2d looking_at = player.position.centre();
         float scale = calculate_auto_scale_factor() / 1000;
         planet::sdl::renderer renderer = {game.window};
-        planet::sdl::drawframe arena = {renderer};
+        planet::sdl::panel arena = {renderer};
 
         std::function<void(void)> hud;
 
