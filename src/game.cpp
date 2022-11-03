@@ -117,7 +117,7 @@ felspar::coro::task<void> game::round::died(update::player reason) {
 
     auto const score = planet::sdl::texture{
             renderer,
-            game.font.render(("Your final score: "
+            game.font.render(("Your final score is "
                               + std::to_string(player.current_score()))
                                      .c_str())};
 
