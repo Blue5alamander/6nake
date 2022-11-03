@@ -30,8 +30,8 @@ felspar::coro::task<int> game::main::run() {
             case SDL_MOUSEBUTTONUP:
                 switch (event.button.button) {
                 case SDL_BUTTON_LEFT:
-                    mouse_click = planet::affine::point2d{
-                            float(event.motion.x), float(event.motion.y)};
+                    mouse_click.push(planet::affine::point2d{
+                            float(event.motion.x), float(event.motion.y)});
                     break;
                 }
                 break;
@@ -88,23 +88,17 @@ felspar::coro::task<update::message> game::round::play() {
         renderer.copy(health, game.window.width() - health_size.w, 0);
     };
     while (true) {
-        auto click = std::exchange(game.mouse_click, {});
-        if (click) {
-            auto const move =
-                    arena.viewport.outof(*click) - player.position.centre();
-            if (move.mag2() > 1.0f) {
-                auto const theta = move.theta();
-                auto const index =
-                        std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
-                auto const outcome =
-                        player.move(world, planet::hexmap::directions[index]);
+        auto click = co_await game.mouse_click.next();
+        auto const move =
+                arena.viewport.outof(click) - player.position.centre();
+        if (move.mag2() > 1.0f) {
+            auto const theta = move.theta();
+            auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
+            auto const outcome =
+                    player.move(world, planet::hexmap::directions[index]);
 
-                if (outcome.state != update::player::alive) {
-                    co_return outcome;
-                }
-            }
+            if (outcome.state != update::player::alive) { co_return outcome; }
         }
-        co_await renderer.next_frame();
     }
 }
 
@@ -143,6 +137,7 @@ felspar::coro::task<void> game::round::died(update::player reason) {
                 game.window.height() / 3);
     };
     co_await game.sdl.io.sleep(2s);
+    co_await game.mouse_click.next();
 }
 
 

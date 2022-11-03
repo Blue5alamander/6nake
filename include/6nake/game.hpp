@@ -23,7 +23,7 @@ namespace game {
         felspar::coro::task<int> run();
 
         /// If a mouse click is detected it will appear here
-        std::optional<planet::affine::point2d> mouse_click;
+        felspar::coro::bus<planet::affine::point2d> mouse_click;
 
       private:
         felspar::coro::task<void> interface();
