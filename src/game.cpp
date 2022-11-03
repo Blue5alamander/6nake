@@ -15,7 +15,7 @@ using namespace std::literals;
 game::main::main(planet::sdl::init &i)
 : sdl{i},
   window{sdl, "6nake", SDL_WINDOW_FULLSCREEN_DESKTOP},
-  font{"Pixellettersfull-BnJ5.ttf", window.height() / 10} {}
+  font{"Pixellettersfull-BnJ5.ttf", window.height() / 10, {255, 255, 255}} {}
 
 
 felspar::coro::task<int> game::main::run() {
@@ -75,15 +75,13 @@ felspar::coro::task<update::message> game::round::play() {
                 renderer,
                 game.font.render(
                         ("Score: " + std::to_string(player.current_score()))
-                                .c_str(),
-                        {255, 255, 255})};
+                                .c_str())};
         renderer.copy(score, 0, 0);
         planet::sdl::texture health{
                 renderer,
                 game.font.render(
                         ("Health: " + std::to_string(player.current_health()))
-                                .c_str(),
-                        {255, 255, 255})};
+                                .c_str())};
         auto const health_size = health.extents();
         renderer.copy(health, game.window.width() - health_size.w, 0);
     };
@@ -114,16 +112,14 @@ felspar::coro::task<void> game::round::died(update::player reason) {
         explanation = "You ran out of health and died from exhaustion";
         break;
     }
-    auto const text = planet::sdl::texture{
-            renderer, game.font.render(explanation, {255, 255, 255})};
+    auto const text =
+            planet::sdl::texture{renderer, game.font.render(explanation)};
 
     auto const score = planet::sdl::texture{
             renderer,
-            game.font.render(
-                    ("Your final score: "
-                     + std::to_string(player.current_score()))
-                            .c_str(),
-                    {255, 255, 255})};
+            game.font.render(("Your final score: "
+                              + std::to_string(player.current_score()))
+                                     .c_str())};
 
     hud = [this, &text, &score]() {
         auto const score_size = score.extents();
