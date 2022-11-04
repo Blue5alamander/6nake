@@ -1,7 +1,7 @@
 #include <6nake/draw.hpp>
 #include <6nake/game.hpp>
 
-#include <felspar/coro/start.hpp>
+#include <felspar/coro/eager.hpp>
 
 
 using namespace std::literals;
@@ -19,7 +19,7 @@ game::main::main(planet::sdl::init &i)
 
 
 felspar::coro::task<int> game::main::run() {
-    felspar::coro::starter ui;
+    felspar::coro::eager<> ui;
     ui.post(*this, &main::interface);
 
     while (true) {
@@ -37,8 +37,7 @@ felspar::coro::task<int> game::main::run() {
                 break;
             }
         }
-        ui.garbage_collect_completed();
-        if (ui.empty()) { co_return 0; }
+        if (ui.done()) { co_return 0; }
         co_await sdl.io.sleep(50ms);
     }
 }
