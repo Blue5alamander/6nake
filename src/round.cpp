@@ -89,8 +89,10 @@ class text_button {
     }
 
     felspar::coro::task<void> button_response() {
-        co_await panel.mouse_click.next();
-        output_to.push(press_value);
+        while (true) {
+            co_await panel.mouse_click.next();
+            output_to.push(press_value);
+        }
     }
 };
 
