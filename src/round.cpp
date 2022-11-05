@@ -143,7 +143,9 @@ felspar::coro::task<bool> game::round::died(update::player reason) {
             game.screen,
             {2.0f * game.window.width() / 3.0f,
              2.0f * game.window.height() / 3.0f});
-    co_return co_await choice.next();
+    bool const go_again = co_await choice.next();
+    co_await game.sdl.io.sleep(10ms);
+    co_return go_again;
 }
 
 
