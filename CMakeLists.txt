@@ -4,15 +4,7 @@ project(6nake)
 add_custom_target(check)
 
 add_subdirectory(libs)
+add_subdirectory(src)
 
-add_executable(6nake
-        src/6nake.cpp
-        src/draw.cpp
-        src/game.cpp
-        src/mapgen.cpp
-        src/player.cpp
-    )
-target_include_directories(6nake PUBLIC ./include/)
-target_link_libraries(6nake
-        planet-sdl
-    )
+add_executable(6nake 6nake.cpp)
+target_link_libraries(6nake lib6nake)
