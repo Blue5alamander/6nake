@@ -45,6 +45,7 @@ felspar::coro::task<int> game::main::run() {
 
 
 felspar::coro::task<void> game::main::interface() {
+    co_await game::intro{*this}.show();
     while (true) {
         game::round round{*this};
         auto outcome = co_await round.play();
