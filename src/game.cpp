@@ -29,7 +29,7 @@ felspar::coro::task<int> game::main::run() {
             case SDL_MOUSEBUTTONUP:
                 switch (event.button.button) {
                 case SDL_BUTTON_LEFT:
-                    mouse_click.push(planet::affine::point2d{
+                    screen.mouse_click.push(planet::affine::point2d{
                             float(event.motion.x), float(event.motion.y)});
                     break;
                 }
@@ -50,7 +50,7 @@ felspar::coro::task<void> game::main::interface() {
         case update::player::alive: co_return;
         case update::player::dead_self: [[fallthrough]];
         case update::player::dead_health:
-            co_await round.died(outcome.state);
+            if (not co_await round.died(outcome.state)) { co_return; }
             break;
         }
     }

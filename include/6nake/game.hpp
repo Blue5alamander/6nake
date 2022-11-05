@@ -16,13 +16,11 @@ namespace game {
         planet::sdl::init &sdl;
         planet::sdl::window window;
         planet::sdl::font font;
+        planet::sdl::panel screen;
 
         main(planet::sdl::init &);
 
         felspar::coro::task<int> run();
-
-        /// If a mouse click is detected it will appear here
-        felspar::coro::bus<planet::affine::point2d> mouse_click;
 
       private:
         felspar::coro::task<void> interface();
@@ -33,7 +31,7 @@ namespace game {
         round(main &m);
 
         felspar::coro::task<update::message> play();
-        felspar::coro::task<void> died(update::player);
+        felspar::coro::task<bool> died(update::player);
 
       private:
         main &game;

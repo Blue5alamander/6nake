@@ -11,6 +11,9 @@ using namespace std::literals;
 
 
 game::round::round(main &g) : game{g} {
+    game.screen.add_child(
+            arena, {0, 0},
+            {float(game.window.width()), float(game.window.height())});
     renderer.connect(*this, &round::render);
 }
 
@@ -32,7 +35,7 @@ felspar::coro::task<update::message> game::round::play() {
         renderer.copy(health, game.window.width() - health_size.w, 0);
     };
     while (true) {
-        auto click = co_await game.mouse_click.next();
+        auto click = co_await game.screen.mouse_click.next();
         auto const move = arena.outof(click) - player.position.centre();
         if (move.mag2() > 1.0f) {
             auto const theta = move.theta();
@@ -46,10 +49,56 @@ felspar::coro::task<update::message> game::round::play() {
 }
 
 
-felspar::coro::task<void> game::round::died(update::player reason) {
+template<typename R>
+class text_button {
+  public:
+    planet::sdl::renderer &renderer;
+    planet::sdl::panel panel;
+    planet::sdl::texture graphic;
+    planet::affine::point2d top_left = {0, 0}, bottom_right = {0, 0};
+    bool visible = false;
+
+    R press_value;
+    felspar::coro::bus<R> &output_to;
+    felspar::coro::eager<> response;
+
+    text_button(
+            planet::sdl::renderer &r,
+            planet::sdl::surface text,
+            felspar::coro::bus<R> &o,
+            R v)
+    : renderer{r},
+      panel{r},
+      graphic{r, std::move(text)},
+      press_value{v},
+      output_to{o} {
+        auto const sz = graphic.extents();
+        top_left = {sz.w / -2.0f, sz.h / -2.0f};
+        bottom_right = -top_left;
+    }
+
+    void
+            add_to(planet::sdl::panel &parent,
+                   planet::affine::point2d const centre) {
+        parent.add_child(panel, top_left + centre, bottom_right + centre);
+        response.post(*this, &text_button::button_response);
+        visible = true;
+    }
+    void draw() const {
+        if (visible) { panel.copy(graphic, {0, 0}); }
+    }
+
+    felspar::coro::task<void> button_response() {
+        co_await panel.mouse_click.next();
+        output_to.push(press_value);
+    }
+};
+
+
+felspar::coro::task<bool> game::round::died(update::player reason) {
     char const *explanation = nullptr;
     switch (reason) {
-    case update::player::alive: co_return; // This shouldn't have happened
+    case update::player::alive: co_return false; // This shouldn't have happened
     case update::player::dead_self:
         explanation = "You can't eat yourself, so you died!";
         break;
@@ -66,35 +115,10 @@ felspar::coro::task<void> game::round::died(update::player reason) {
                               + std::to_string(player.current_score()))
                                      .c_str())};
 
-    class text_button {
-      public:
-        planet::sdl::renderer &renderer;
-        planet::sdl::panel panel;
-        planet::sdl::texture graphic;
-        planet::affine::point2d position = {0, 0};
-        std::size_t width, height;
-
-        text_button(planet::sdl::renderer &r, planet::sdl::surface text)
-        : renderer{r}, panel{r}, graphic{r, std::move(text)} {
-            auto const sz = graphic.extents();
-            width = sz.w;
-            height = sz.h;
-        }
-
-        void draw() const {
-            renderer.copy(graphic, position.x(), position.y());
-        }
-    };
-
-    text_button again{renderer, game.font.render("Play again")},
-            quit{renderer, game.font.render("Quit")};
-
-    again.position = {
-            (game.window.width() - again.width) / 3.0f,
-            2.0f * game.window.height() / 3.0f};
-    quit.position = {
-            2.0f * (game.window.width() - quit.width) / 3.0f,
-            2.0f * game.window.height() / 3.0f};
+    felspar::coro::bus<bool> choice;
+    text_button<bool> again{
+            renderer, game.font.render("Play again"), choice, true},
+            quit{renderer, game.font.render("Quit"), choice, false};
 
     hud = [&, this]() {
         auto const score_size = score.extents();
@@ -110,8 +134,16 @@ felspar::coro::task<void> game::round::died(update::player reason) {
         again.draw();
         quit.draw();
     };
+
     co_await game.sdl.io.sleep(2s);
-    co_await game.mouse_click.next();
+    again.add_to(
+            game.screen,
+            {game.window.width() / 3.0f, 2.0f * game.window.height() / 3.0f});
+    quit.add_to(
+            game.screen,
+            {2.0f * game.window.width() / 3.0f,
+             2.0f * game.window.height() / 3.0f});
+    co_return co_await choice.next();
 }
 
 
