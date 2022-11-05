@@ -66,16 +66,49 @@ felspar::coro::task<void> game::round::died(update::player reason) {
                               + std::to_string(player.current_score()))
                                      .c_str())};
 
-    hud = [this, &text, &score]() {
+    class text_button {
+      public:
+        planet::sdl::renderer &renderer;
+        planet::sdl::panel panel;
+        planet::sdl::texture graphic;
+        planet::affine::point2d position = {0, 0};
+        std::size_t width, height;
+
+        text_button(planet::sdl::renderer &r, planet::sdl::surface text)
+        : renderer{r}, panel{r}, graphic{r, std::move(text)} {
+            auto const sz = graphic.extents();
+            width = sz.w;
+            height = sz.h;
+        }
+
+        void draw() const {
+            renderer.copy(graphic, position.x(), position.y());
+        }
+    };
+
+    text_button again{renderer, game.font.render("Play again")},
+            quit{renderer, game.font.render("Quit")};
+
+    again.position = {
+            (game.window.width() - again.width) / 3.0f,
+            2.0f * game.window.height() / 3.0f};
+    quit.position = {
+            2.0f * (game.window.width() - quit.width) / 3.0f,
+            2.0f * game.window.height() / 3.0f};
+
+    hud = [&, this]() {
         auto const score_size = score.extents();
         renderer.copy(
                 score, (game.window.width() - score_size.w) / 2,
-                2 * game.window.height() / 3);
+                game.window.height() / 2);
 
         auto const text_size = text.extents();
         renderer.copy(
                 text, (game.window.width() - text_size.w) / 2,
                 game.window.height() / 3);
+
+        again.draw();
+        quit.draw();
     };
     co_await game.sdl.io.sleep(2s);
     co_await game.mouse_click.next();
