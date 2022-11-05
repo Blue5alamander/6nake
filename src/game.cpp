@@ -86,8 +86,7 @@ felspar::coro::task<update::message> game::round::play() {
     };
     while (true) {
         auto click = co_await game.mouse_click.next();
-        auto const move =
-                arena.viewport.outof(click) - player.position.centre();
+        auto const move = arena.outof(click) - player.position.centre();
         if (move.mag2() > 1.0f) {
             auto const theta = move.theta();
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
@@ -151,8 +150,8 @@ felspar::coro::stream<planet::sdl::renderer::frame> game::round::render() {
         renderer.colour(5, 5, 5);
         renderer.clear();
 
-        arena.viewport = {};
-        arena.viewport.translate(-looking_at)
+        arena.reset_coordinate_space();
+        arena.translate(-looking_at)
                 .reflect_y()
                 .scale(scale)
                 .translate(
