@@ -50,38 +50,34 @@ felspar::coro::task<update::message> game::round::play() {
 
 
 template<typename R>
-class text_button {
+class button {
   public:
     planet::sdl::renderer &renderer;
     planet::sdl::panel panel;
     planet::sdl::texture graphic;
-    planet::affine::point2d top_left = {0, 0}, bottom_right = {0, 0};
     bool visible = false;
 
     R press_value;
     felspar::coro::bus<R> &output_to;
     felspar::coro::eager<> response;
 
-    text_button(
-            planet::sdl::renderer &r,
-            planet::sdl::surface text,
-            felspar::coro::bus<R> &o,
-            R v)
+    button(planet::sdl::renderer &r,
+           planet::sdl::surface text,
+           felspar::coro::bus<R> &o,
+           R v)
     : renderer{r},
       panel{r},
       graphic{r, std::move(text)},
       press_value{v},
-      output_to{o} {
-        auto const sz = graphic.extents();
-        top_left = {sz.w / -2.0f, sz.h / -2.0f};
-        bottom_right = -top_left;
-    }
+      output_to{o} {}
 
     void
             add_to(planet::sdl::panel &parent,
                    planet::affine::point2d const centre) {
-        parent.add_child(panel, top_left + centre, bottom_right + centre);
-        response.post(*this, &text_button::button_response);
+        auto const sz = graphic.extents();
+        planet::affine::point2d const half = {sz.w / 2.0f, sz.h / 2.0f};
+        parent.add_child(panel, centre - half, centre + half);
+        response.post(*this, &button::button_response);
         visible = true;
     }
     void draw() const {
@@ -118,8 +114,7 @@ felspar::coro::task<bool> game::round::died(update::player reason) {
                                      .c_str())};
 
     felspar::coro::bus<bool> choice;
-    text_button<bool> again{
-            renderer, game.font.render("Play again"), choice, true},
+    button<bool> again{renderer, game.font.render("Play again"), choice, true},
             quit{renderer, game.font.render("Quit"), choice, false};
 
     hud = [&, this]() {
