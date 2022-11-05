@@ -1,4 +1,6 @@
 #include <6nake/game.hpp>
+#include <6nake/intro.hpp>
+#include <6nake/round.hpp>
 
 #include <felspar/coro/eager.hpp>
 

@@ -1,5 +1,6 @@
 #include <6nake/draw.hpp>
 #include <6nake/game.hpp>
+#include <6nake/round.hpp>
 
 #include <planet/sdl/ui.hpp>
 
