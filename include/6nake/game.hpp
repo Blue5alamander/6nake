@@ -6,7 +6,6 @@
 
 #include <planet/sdl.hpp>
 
-#include <felspar/coro/start.hpp>
 #include <felspar/coro/stream.hpp>
 
 
