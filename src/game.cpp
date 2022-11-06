@@ -13,10 +13,14 @@ using namespace std::literals;
  */
 
 
-game::main::main(planet::sdl::init &i)
+game::main::main(planet::sdl::init &i, std::filesystem::path exe)
 : sdl{i},
+  assets{std::move(exe)},
   window{sdl, "6nake", SDL_WINDOW_FULLSCREEN_DESKTOP},
-  font{"Pixellettersfull-BnJ5.ttf", window.height() / 10, {255, 255, 255}} {}
+  font{assets,
+       "Pixellettersfull-BnJ5.ttf",
+       window.height() / 10,
+       {255, 255, 255}} {}
 
 
 felspar::coro::task<int> game::main::run() {
