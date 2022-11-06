@@ -3,7 +3,13 @@
 
 ## Build instructions for Linux
 
-You'll need to have `cmake`, `build-essential` and the `libsdl2-dev` and `libsdl2-ttf-dev` packages.
+You'll need to have some development tools and libraries available. On Debian based systems (like Ubuntu) the following should suffice:
+
+```bash
+sudo apt install cmake build-essential libsdl2-dev libsdl2-ttf-dev
+```
+
+Then to clone and build, the following can be used:
 
 ```bash
 git clone --recursive git@github.com:KayEss/6nake.git
