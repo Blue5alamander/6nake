@@ -1,7 +1,6 @@
 add_library(lib6nake
         draw.cpp
         game.cpp
-        intro.cpp
         mapgen.cpp
         player.cpp
         round.cpp
