@@ -13,6 +13,7 @@ namespace game {
         planet::sdl::window window;
         planet::sdl::font font;
         planet::sdl::panel screen;
+        planet::sdl::audio_output sound;
 
         main(planet::sdl::init &, std::filesystem::path);
 

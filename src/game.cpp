@@ -5,6 +5,7 @@
 
 
 using namespace std::literals;
+using namespace planet::audio::literals;
 
 
 /**
@@ -19,7 +20,12 @@ game::main::main(planet::sdl::init &i, std::filesystem::path exe)
   font{assets,
        "Pixellettersfull-BnJ5.ttf",
        window.height() / 10,
-       {255, 255, 255}} {}
+       {255, 255, 255}},
+  sound{planet::audio::stereobuffer(
+          planet::audio::monobuffer<planet::audio::sample_clock>(
+                  planet::audio::oscillator(
+                          440.0f / planet::audio::sample_clock::period::den)))} {
+}
 
 
 felspar::coro::task<int> game::main::run() {
