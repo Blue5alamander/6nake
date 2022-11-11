@@ -3,7 +3,7 @@ project(6nake)
 
 add_custom_target(check)
 
-add_subdirectory(libs)
+add_subdirectory(lib)
 add_subdirectory(src)
 
 add_executable(6nake 6nake.cpp)

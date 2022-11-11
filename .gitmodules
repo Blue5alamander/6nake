@@ -1,24 +1,24 @@
 [submodule "libs/planet"]
-	path = libs/planet
+	path = lib/planet
 	url = git@github.com:KayEss/planet.git
 [submodule "libs/coro"]
-	path = libs/coro
+	path = lib/coro
 	url = git@github.com:Felspar/coro.git
 [submodule "libs/test"]
-	path = libs/test
+	path = lib/test
 	url = git@github.com:Felspar/test.git
 [submodule "libs/exceptions"]
-	path = libs/exceptions
+	path = lib/exceptions
 	url = git@github.com:Felspar/exceptions.git
 [submodule "libs/memory"]
-	path = libs/memory
+	path = lib/memory
 	url = git@github.com:Felspar/memory.git
 [submodule "libs/planet-sdl"]
-	path = libs/planet-sdl
+	path = lib/planet-sdl
 	url = git@github.com:KayEss/planet-sdl.git
 [submodule "libs/io"]
-	path = libs/io
+	path = lib/io
 	url = git@github.com:Felspar/io.git
 [submodule "libs/planet-audio"]
-	path = libs/planet-audio
+	path = lib/planet-audio
 	url = git@github.com:KayEss/planet-audio.git
