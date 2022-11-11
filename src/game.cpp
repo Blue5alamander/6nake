@@ -21,11 +21,7 @@ game::main::main(planet::sdl::init &i, std::filesystem::path exe)
        "Pixellettersfull-BnJ5.ttf",
        window.height() / 10,
        {255, 255, 255}},
-  sound{planet::audio::stereobuffer(
-          planet::audio::monobuffer<planet::audio::sample_clock>(
-                  planet::audio::oscillator(
-                          440.0f / planet::audio::sample_clock::period::den)))} {
-}
+  move{assets, "move.wav"} {}
 
 
 felspar::coro::task<int> game::main::run() {

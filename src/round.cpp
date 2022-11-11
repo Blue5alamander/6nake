@@ -45,6 +45,7 @@ felspar::coro::task<update::message> game::round::play() {
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
             auto const outcome =
                     player.move(world, planet::hexmap::directions[index]);
+            game.sound.trigger(game.move.output());
 
             if (outcome.state != update::player::alive) { co_return outcome; }
         }

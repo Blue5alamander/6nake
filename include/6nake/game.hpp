@@ -11,9 +11,13 @@ namespace game {
         planet::sdl::init &sdl;
         planet::asset_manager assets;
         planet::sdl::window window;
-        planet::sdl::font font;
         planet::sdl::panel screen;
         planet::sdl::audio_output sound;
+
+        /// Assets
+        planet::sdl::font font;
+        planet::audio::wav move;
+
 
         main(planet::sdl::init &, std::filesystem::path);
 
