@@ -116,7 +116,7 @@ float game::round::calculate_auto_scale_factor() const {
 felspar::coro::stream<planet::sdl::renderer::frame> game::round::render() {
     std::size_t number{};
     /// Auto scaling with scaling animation
-    for (bool quit = false; not quit;) {
+    while (true) {
         ++number;
 
         renderer.colour(5, 5, 5);
