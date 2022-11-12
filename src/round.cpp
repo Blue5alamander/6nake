@@ -45,7 +45,23 @@ felspar::coro::task<update::message> game::round::play() {
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
             auto const outcome =
                     player.move(world, planet::hexmap::directions[index]);
-            game.sound.trigger(game.move.output());
+            switch (outcome.consumed) {
+            case mapgen::feature::none:
+                game.sound.trigger(game.move.output());
+                break;
+            case mapgen::feature::rock:
+                game.sound.trigger(game.rock.output());
+                break;
+            case mapgen::feature::food:
+                game.sound.trigger(game.pop.output());
+                break;
+            case mapgen::feature::food_plus:
+                game.sound.trigger(game.bonk.output());
+                break;
+            case mapgen::feature::vision_plus:
+                game.sound.trigger(game.blip.output());
+                break;
+            }
 
             if (outcome.state != update::player::alive) { co_return outcome; }
         }
@@ -54,6 +70,8 @@ felspar::coro::task<update::message> game::round::play() {
 
 
 felspar::coro::task<bool> game::round::died(update::player reason) {
+    game.sound.trigger(game.death.output());
+
     char const *explanation = nullptr;
     switch (reason) {
     case update::player::alive: co_return false; // This shouldn't have happened

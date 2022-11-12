@@ -16,7 +16,7 @@ namespace game {
 
         /// Assets
         planet::sdl::font font;
-        planet::audio::wav move;
+        planet::audio::wav blip, bonk, death, move, pop, rock;
 
 
         main(planet::sdl::init &, std::filesystem::path);

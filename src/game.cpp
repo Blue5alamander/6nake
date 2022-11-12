@@ -21,7 +21,12 @@ game::main::main(planet::sdl::init &i, std::filesystem::path exe)
        "Pixellettersfull-BnJ5.ttf",
        window.height() / 10,
        {255, 255, 255}},
-  move{assets, "move.wav"} {}
+  blip{assets, "blip.wav"},
+  bonk{assets, "bonk.wav"},
+  death{assets, "death.wav"},
+  move{assets, "move.wav"},
+  pop{assets, "pop.wav"},
+  rock{assets, "rock.wav"} {}
 
 
 felspar::coro::task<int> game::main::run() {
