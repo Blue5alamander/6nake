@@ -53,13 +53,13 @@ felspar::coro::task<update::message> game::round::play() {
                 game.sound.trigger(game.rock.output());
                 break;
             case mapgen::feature::food:
-                game.sound.trigger(game.pop.output());
+                game.sound.trigger(game.food.output());
                 break;
             case mapgen::feature::food_plus:
-                game.sound.trigger(game.bonk.output());
+                game.sound.trigger(game.food_plus.output());
                 break;
             case mapgen::feature::vision_plus:
-                game.sound.trigger(game.blip.output());
+                game.sound.trigger(game.vision_plus.output());
                 break;
             }
 
