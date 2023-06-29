@@ -19,14 +19,14 @@ game::main::main(planet::sdl::init &i, std::filesystem::path exe)
   window{sdl, "6nake", SDL_WINDOW_FULLSCREEN_DESKTOP},
   font{assets,
        "Pixellettersfull-BnJ5.ttf",
-       window.height() / 10,
+       window.zheight() / 10,
        {255, 255, 255}},
-  death{assets, "death.wav"},
-  food{assets, "food.wav"},
-  food_plus{assets, "food_plus.wav"},
-  move{assets, "move.wav"},
-  rock{assets, "rock.wav"},
-  vision_plus{assets, "vision_plus.wav"} {}
+  death{assets.file_data("death.ogg")},
+  food{assets.file_data("food.ogg")},
+  food_plus{assets.file_data("food_plus.ogg")},
+  move{assets.file_data("move.ogg")},
+  rock{assets.file_data("rock.ogg")},
+  vision_plus{assets.file_data("vision_plus.ogg")} {}
 
 
 felspar::coro::task<int> game::main::run() {
@@ -41,8 +41,12 @@ felspar::coro::task<int> game::main::run() {
             case SDL_MOUSEBUTTONUP:
                 switch (event.button.button) {
                 case SDL_BUTTON_LEFT:
-                    screen.mouse_click.push(planet::affine::point2d{
-                            float(event.motion.x), float(event.motion.y)});
+                    window.baseplate.events.mouse.push(
+                            {planet::events::button::left,
+                             planet::events::action::up,
+                             planet::affine::point2d{
+                                     float(event.motion.x),
+                                     float(event.motion.y)}});
                     break;
                 }
                 break;

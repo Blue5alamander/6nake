@@ -19,6 +19,6 @@
 [submodule "libs/io"]
 	path = lib/io
 	url = git@github.com:Felspar/io.git
-[submodule "libs/planet-audio"]
-	path = lib/planet-audio
-	url = git@github.com:KayEss/planet-audio.git
+[submodule "lib/parse"]
+	path = lib/parse
+	url = git@github.com:Felspar/parse.git

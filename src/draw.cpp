@@ -4,10 +4,10 @@
 
 void draw::world(
         planet::sdl::renderer &renderer,
-        planet::sdl::panel &draw,
+        planet::ui::panel &draw,
         mapgen::hex::world_type const &world,
         player::snake const &player,
-        long const range) {
+        planet::hexmap::coordinates::value_type const range) {
     auto const top_left =
             player.position + planet::hexmap::coordinates{-range, range};
     auto const bottom_right = player.position
@@ -52,7 +52,7 @@ void draw::world(
             for (std::size_t index{}; index < player.size() - 1; ++index) {
                 auto const p = player[index];
                 draw_hex(renderer, draw, p, 0.6f);
-                draw.line(p.centre(), player[index + 1].centre());
+                draw.line(renderer, p.centre(), player[index + 1].centre());
             }
         }
     }

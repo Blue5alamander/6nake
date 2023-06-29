@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+
+export MANGOHUD_CONFIGFILE=$(pwd)/MangoHud.conf
+
+ninja -C $1 all check felspar-check
+LOCATION=./$1/../../dist/$(basename $1)
+ninja -C $1 install
+cd $LOCATION
+pwd
+
+#mangohud ./bin/6nake
+./bin/6nake

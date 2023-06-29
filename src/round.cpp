@@ -2,7 +2,8 @@
 #include <6nake/game.hpp>
 #include <6nake/round.hpp>
 
-#include <planet/sdl/ui.hpp>
+#include <planet/ui.hpp>
+#include <planet/sdl/ui/button.hpp>
 
 
 using namespace std::literals;
@@ -17,7 +18,6 @@ game::round::round(main &g) : game{g} {
     game.screen.add_child(
             arena, {0, 0},
             {float(game.window.width()), float(game.window.height())});
-    renderer.connect(*this, &round::render);
 }
 
 
@@ -35,11 +35,12 @@ felspar::coro::task<update::message> game::round::play() {
                         ("Health: " + std::to_string(player.current_health()))
                                 .c_str())};
         auto const health_size = health.extents();
-        renderer.copy(health, game.window.width() - health_size.w, 0);
+        renderer.copy(health, game.window.width() - health_size.width, 0);
     };
     while (true) {
-        auto click = co_await game.screen.mouse_click.next();
-        auto const move = arena.outof(click) - player.position.centre();
+        auto click = co_await game.window.baseplate.events.mouse.next();
+        auto const move =
+                arena.outof(click.location) - player.position.centre();
         if (move.mag2() > 1.0f) {
             auto const theta = move.theta();
             auto const index = std::size_t(6.0f * (theta + 1.0f / 12.0f)) % 6;
@@ -47,19 +48,19 @@ felspar::coro::task<update::message> game::round::play() {
                     player.move(world, planet::hexmap::directions[index]);
             switch (outcome.consumed) {
             case mapgen::feature::none:
-                game.sound.trigger(game.move.output());
+                game.sound.trigger(game.move.stereo());
                 break;
             case mapgen::feature::rock:
-                game.sound.trigger(game.rock.output());
+                game.sound.trigger(game.rock.stereo());
                 break;
             case mapgen::feature::food:
-                game.sound.trigger(game.food.output());
+                game.sound.trigger(game.food.stereo());
                 break;
             case mapgen::feature::food_plus:
-                game.sound.trigger(game.food_plus.output());
+                game.sound.trigger(game.food_plus.stereo());
                 break;
             case mapgen::feature::vision_plus:
-                game.sound.trigger(game.vision_plus.output());
+                game.sound.trigger(game.vision_plus.stereo());
                 break;
             }
 
@@ -70,7 +71,7 @@ felspar::coro::task<update::message> game::round::play() {
 
 
 felspar::coro::task<bool> game::round::died(update::player reason) {
-    game.sound.trigger(game.death.output());
+    game.sound.trigger(game.death.stereo());
 
     char const *explanation = nullptr;
     switch (reason) {
@@ -99,26 +100,21 @@ felspar::coro::task<bool> game::round::died(update::player reason) {
     hud = [&, this]() {
         auto const score_size = score.extents();
         renderer.copy(
-                score, (game.window.width() - score_size.w) / 2,
+                score, (game.window.width() - score_size.width) / 2,
                 game.window.height() / 2);
 
         auto const text_size = text.extents();
         renderer.copy(
-                text, (game.window.width() - text_size.w) / 2,
+                text, (game.window.width() - text_size.width) / 2,
                 game.window.height() / 3);
 
-        again.draw();
-        quit.draw();
+        again.draw(renderer);
+        quit.draw(renderer);
     };
 
     co_await game.sdl.io.sleep(2s);
-    again.add_to(
-            game.screen,
-            {game.window.width() / 3.0f, 2.0f * game.window.height() / 3.0f});
-    quit.add_to(
-            game.screen,
-            {2.0f * game.window.width() / 3.0f,
-             2.0f * game.window.height() / 3.0f});
+    again.add_to(game.window.baseplate, game.screen);
+    quit.add_to(game.window.baseplate, game.screen);
     bool const go_again = co_await choice.next();
     co_await game.sdl.io.sleep(10ms);
     co_return go_again;
@@ -132,11 +128,8 @@ float game::round::calculate_auto_scale_factor() const {
 
 
 felspar::coro::stream<planet::sdl::renderer::frame> game::round::render() {
-    std::size_t number{};
     /// Auto scaling with scaling animation
     while (true) {
-        ++number;
-
         renderer.colour(5, 5, 5);
         renderer.clear();
 
@@ -164,8 +157,7 @@ felspar::coro::stream<planet::sdl::renderer::frame> game::round::render() {
         draw::world(renderer, arena, world, player, player.vision_distance());
         if (hud) { hud(); }
 
-        renderer.present();
-        co_yield planet::sdl::renderer::frame{number};
+        co_yield renderer.present();
         co_await game.sdl.io.sleep(10ms);
     }
 }

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+cd $(dirname $0)
+set -e
+
+update() {
+    git -C $1 checkout $2
+    git -C $1 pull
+}
+
+update coro main
+update exceptions main
+update io main
+update memory main
+update parse main
+update planet main
+update planet-sdl main
+update test main

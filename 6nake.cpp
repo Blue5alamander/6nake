@@ -11,5 +11,5 @@ int main(int args, char const *argv[]) {
                 game::main game{sdl, {argv[0]}};
                 co_return co_await game.run();
             },
-            args, argv);
+            "6nake", args, argv);
 }

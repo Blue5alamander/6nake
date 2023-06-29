@@ -24,8 +24,8 @@ namespace game {
         player::snake player = {world};
         planet::affine::point2d looking_at = player.position.centre();
         float scale = calculate_auto_scale_factor() / 1000;
-        planet::sdl::renderer renderer = {game.window};
-        planet::sdl::panel arena = {renderer};
+        planet::sdl::renderer &renderer = {game.window.renderer};
+        planet::ui::panel arena;
 
         std::function<void(void)> hud;
 

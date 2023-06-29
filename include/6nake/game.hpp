@@ -11,12 +11,12 @@ namespace game {
         planet::sdl::init &sdl;
         planet::asset_manager assets;
         planet::sdl::window window;
-        planet::sdl::panel screen;
+        planet::ui::panel screen;
         planet::sdl::audio_output sound;
 
         /// Assets
         planet::sdl::font font;
-        planet::audio::wav death, food, food_plus, move, rock, vision_plus;
+        planet::audio::ogg death, food, food_plus, move, rock, vision_plus;
 
 
         main(planet::sdl::init &, std::filesystem::path);
