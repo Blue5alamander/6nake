@@ -31,6 +31,7 @@ namespace game {
 
         float calculate_auto_scale_factor() const;
         felspar::coro::stream<planet::sdl::renderer::frame> render();
+        planet::sdl::render_loop loop{*this, &round::render};
     };
 
 
