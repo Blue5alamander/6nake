@@ -19,7 +19,7 @@ game::main::main(planet::sdl::init &i, std::filesystem::path exe)
   window{sdl, "6nake", SDL_WINDOW_FULLSCREEN_DESKTOP},
   font{assets,
        "Pixellettersfull-BnJ5.ttf",
-       window.zheight() / 10,
+       window.uzheight() / 10,
        {255, 255, 255}},
   death{assets.file_data("death.ogg")},
   food{assets.file_data("food.ogg")},
