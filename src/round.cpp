@@ -92,7 +92,7 @@ felspar::coro::task<bool> game::round::died(update::player reason) {
                               + std::to_string(player.current_score()))
                                      .c_str())};
 
-    felspar::coro::bus<bool> choice;
+    planet::queue::pmc<bool> choice;
     planet::sdl::ui::button<bool> again{
             renderer, game.font.render("Play again"), choice, true},
             quit{renderer, game.font.render("Quit"), choice, false};
@@ -115,7 +115,7 @@ felspar::coro::task<bool> game::round::died(update::player reason) {
     co_await game.sdl.io.sleep(2s);
     again.add_to(game.window.baseplate, game.screen);
     quit.add_to(game.window.baseplate, game.screen);
-    bool const go_again = co_await choice.next();
+    bool const go_again = co_await choice.values().next();
     co_await game.sdl.io.sleep(10ms);
     co_return go_again;
 }
