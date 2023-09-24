@@ -6,6 +6,7 @@ CMAKE="cmake -G Ninja ."
 
 export CC=gcc
 export CXX=g++
+export CXXFLAGS="-g"
 
 $CMAKE -B build.tmp/gcc-debug \
     -DCMAKE_INSTALL_PREFIX=dist/gcc-debug
@@ -19,14 +20,14 @@ export CC=clang
 export CXX=clang++
 
 $CMAKE -B build.tmp/clang-debug \
-    -DCMAKE_INSTALL_PREFIX=dist/clang-debug-libc++
+    -DCMAKE_INSTALL_PREFIX=dist/clang-debug
 
 $CMAKE -B build.tmp/clang-release \
-    -DCMAKE_INSTALL_PREFIX=dist/clang-release-libc++ \
+    -DCMAKE_INSTALL_PREFIX=dist/clang-release \
     -DCMAKE_BUILD_TYPE=Release
 
 
-export CXXFLAGS=-stdlib=libc++
+export CXXFLAGS="${CXXFLAGS} -stdlib=libc++"
 
 $CMAKE -B build.tmp/clang-debug-libc++ \
     -DCMAKE_INSTALL_PREFIX=dist/clang-debug-libc++
