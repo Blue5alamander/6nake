@@ -9,9 +9,7 @@
 using namespace std::literals;
 
 
-/**
- * `game::round`
- */
+/// ## `game::round`
 
 
 game::round::round(main &g) : game{g} {
@@ -37,8 +35,9 @@ felspar::coro::task<update::message> game::round::play() {
         auto const health_size = health.extents();
         renderer.copy(health, game.window.width() - health_size.width, 0);
     };
+    auto mouse = game.window.baseplate.events.mouse.values();
     while (true) {
-        auto click = co_await game.window.baseplate.events.mouse.next();
+        auto click = co_await mouse.next();
         auto const move =
                 arena.outof(click.location) - player.position.centre();
         if (move.mag2() > 1.0f) {
