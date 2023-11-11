@@ -9,9 +9,14 @@ time (
         # Release builds
         ninja -C ./build.tmp/clang-release-libc++ all check felspar-check &&
         ninja -C ./build.tmp/gcc-release all check felspar-check &&
+        # libstdc++
+        ninja -C ./build.tmp/clang-debug all check felspar-check &&
+        ninja -C ./build.tmp/clang-release all check felspar-check &&
         # stdlib=libc++ asan
         ninja -C ./build.tmp/clang-debug-asan all check felspar-check &&
+        ninja -C ./build.tmp/clang-release-asan all check felspar-check &&
+        # stdlib=libc++ asan force PMR
+        ninja -C ./build.tmp/clang-debug-pmr-asan all check felspar-check &&
+        ninja -C ./build.tmp/clang-release-pmr-asan all check felspar-check &&
         true
-    ) && (
-        find ./include/ ./lib/ ./src/ -name \*.\?pp -print | xargs clang-format -i
     )
