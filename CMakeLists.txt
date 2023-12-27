@@ -3,6 +3,13 @@ project(6nake)
 
 add_custom_target(check)
 
+add_compile_options(
+        -Werror
+        -fdiagnostics-color=always
+        -fdiagnostics-show-option
+        -Wall -Wextra -Wpedantic
+    )
+
 add_subdirectory(lib)
 add_subdirectory(src)
 
