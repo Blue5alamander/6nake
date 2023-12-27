@@ -107,8 +107,8 @@ felspar::coro::task<bool> game::round::died(update::player reason) {
                 text, (game.window.width() - text_size.width) / 2,
                 game.window.height() / 3);
 
-        again.draw(renderer);
-        quit.draw(renderer);
+        again.draw();
+        quit.draw();
     };
 
     co_await game.sdl.io.sleep(2s);
