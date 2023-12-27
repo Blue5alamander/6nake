@@ -20,7 +20,7 @@ game::main::main(planet::sdl::init &i, std::filesystem::path exe)
   font{assets,
        "Pixellettersfull-BnJ5.ttf",
        window.uzheight() / 10,
-       {255, 255, 255}},
+       {255, 255, 255, 255}},
   death{assets.file_data("death.ogg")},
   food{assets.file_data("food.ogg")},
   food_plus{assets.file_data("food_plus.ogg")},
