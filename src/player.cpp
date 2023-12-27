@@ -56,7 +56,8 @@ update::message player::snake::move(
         outcome.state = update::player::dead_health;
     } else if (outcome.state == update::player::alive) {
         auto const length = health / 8;
-        while (occupies.size() > length) {
+        while (length > 0
+               and occupies.size() > static_cast<std::size_t>(length)) {
             world[occupies.front()].player = nullptr;
             occupies.erase(occupies.begin());
             --outcome.length_delta;
