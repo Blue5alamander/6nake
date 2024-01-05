@@ -3,7 +3,6 @@
 #include <6nake/round.hpp>
 
 #include <planet/ui.hpp>
-#include <planet/sdl/ui/button.hpp>
 
 
 using namespace std::literals;
@@ -92,9 +91,11 @@ felspar::coro::task<bool> game::round::died(update::player reason) {
                                      .c_str())};
 
     planet::queue::pmc<bool> choice;
-    planet::sdl::ui::button<bool> again{
-            renderer, game.font.render("Play again"), choice, true},
-            quit{renderer, game.font.render("Quit"), choice, false};
+    planet::ui::button again{
+            planet::sdl::texture{renderer, game.font.render("Play again")},
+            choice, true},
+            quit{planet::sdl::texture{renderer, game.font.render("Quit")},
+                 choice, false};
 
     hud = [&, this]() {
         auto const score_size = score.extents();
